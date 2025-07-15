@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Perawat;
 
+use App\Models\Pendaftaran;
 use App\Models\User;
 use App\Models\Pasien;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\PengkajianAwal;
 use App\Http\Controllers\Controller;
@@ -25,7 +27,9 @@ class DataKajianAwalController extends Controller
             ->latest()
             ->paginate(5);
 
-        $pasiens = Pasien::all(); // untuk dropdown tambah
+        $pasiens = Pendaftaran::whereDate('created_at', Carbon::today())
+            ->latest()
+            ->get();
         $perawats = User::where('role_id', 4)->get();
 
         return view('Perawat.data-kajian-awal.index', compact('pengkajian', 'pasiens', 'perawats'));
