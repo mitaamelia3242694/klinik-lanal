@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Perawat;
 
+use App\Models\Pendaftaran;
 use App\Models\User;
 use App\Models\Pasien;
 use App\Models\DiagnosaAwal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -26,7 +28,9 @@ class DataDiagnosaAwalController extends Controller
             ->paginate(5)
             ->appends(['search' => $search]);
 
-        $pasiens = Pasien::all();
+        $pasiens = Pendaftaran::whereDate('created_at', Carbon::today())
+            ->latest()
+            ->get();
         $perawats = User::where('role_id', '4')->get();
 
         return view('Perawat.data-diagnosa-awal.index', compact('diagnosas', 'pasiens', 'perawats', 'search'));
@@ -41,10 +45,19 @@ class DataDiagnosaAwalController extends Controller
             'tanggal' => 'required|date',
             'diagnosa' => 'required|string',
             'catatan' => 'nullable|string',
-            'status' => 'required|in:belum_diperiksa,sudah_diperiksa',
+            'status' => 'required',
         ]);
-
-        DiagnosaAwal::create($validated);
+        
+        DiagnosaAwal::create(
+            [
+                'pasien_id' => $request->pasien_id,
+                'user_id' => $request->user_id,
+                'tanggal' => $request->tanggal,
+                'diagnosa' => $request->diagnosa,
+                'catatan' => $request->catatan ?? null,
+                'status' => $request->status,
+            ]
+        );
 
         return redirect()->route('data-diagnosa-awal.index')->with('success', 'Data berhasil ditambahkan.');
     }

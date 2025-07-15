@@ -114,8 +114,9 @@
                 <label style="display:block; text-align:left;"><strong>Pasien</strong></label>
                 <select name="pasien_id" required class="input-style">
                     <option value="">-- Pilih Pasien --</option>
-                    @foreach ($pasiens as $pasien)
-                    <option value="{{ $pasien->id }}">{{ $pasien->nama }}</option>
+                    @foreach ($pasiens as $item)
+                    <option value="{{ $item->pasien->id }}">{{ $item->pasien->nama }} -
+                                {{ \Carbon\Carbon::parse($item->created_at)->translatedFormat('d F Y') }} </option>
                     @endforeach
                 </select>
 
